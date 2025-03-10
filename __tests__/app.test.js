@@ -74,7 +74,7 @@ describe('GET /api/articles/:article_id', () => {
 
   test('400: responds with error msg of bad request if no such id', () => {
     return request(app)
-      .get('/api/articles/hola')
+      .get('/api/articles/holaa')
       .then(({body})=>{
         expect(400)
         expect(body.msg).toBe('bad request')

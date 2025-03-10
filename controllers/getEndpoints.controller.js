@@ -1,7 +1,6 @@
 const endpoints = require('../endpoints.json')
 
 
-exports.getEndpoints = (res,req,next) => {
+exports.getEndpoints = (req,res,next) => {
     res.status(200).send({endpoints})
-    
 }

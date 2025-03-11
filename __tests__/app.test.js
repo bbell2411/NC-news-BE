@@ -1,9 +1,10 @@
 const endpointsJson = require("../endpoints.json");
 const request = require('supertest')
 const seed = require('../db/seeds/seed')
-const data = require('../db/data/test-data')
+const data = require('../db/data/test-data/index')
 const app = require('../app')
 const db = require('../db/connection')
+const { toBeSortedBy } = require('jest-sorted')
 
 
 beforeEach(() => {
@@ -44,6 +45,49 @@ describe('GET /api/topics', () => {
   })
 })
 
+describe('GET /api/articles', () => {
+  test('200: gets articles', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        articles.forEach((article) => {
+
+          const { article_id, title, topic, author, created_at, votes, article_img_url, comment_count } = article
+          expect(typeof article_id).toBe('number')
+          expect(typeof author).toBe('string')
+          expect(typeof title).toBe('string')
+          expect(typeof topic).toBe('string')
+          expect(typeof created_at).toBe('string')
+          expect(typeof votes).toBe('number')
+          expect(typeof article_img_url).toBe('string')
+          expect(typeof comment_count).toBe('string')
+
+        })
+      })
+
+  })
+  test('200: sorts articles by date in descending order', () => {
+    return request(app)
+      .get('/api/articles?sort_by=created_at')
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy('created_at', { descending: true })
+      })
+
+  })
+  test('404: responds with error message if query is invalid ', () => {
+    return request(app)
+      .get('/api/articles?sort_by=title')
+      .then(({ body }) => {
+        expect(404)
+        expect(body.msg).toBe('invalid sort')
+      })
+
+  })
+})
+
+
 describe('GET /api/articles/:article_id', () => {
   test('200: responds with articles by specific id', () => {
     return request(app)
@@ -66,16 +110,16 @@ describe('GET /api/articles/:article_id', () => {
   test('404: responds with error msg of not found if no such id', () => {
     return request(app)
       .get('/api/articles/87768')
-      .then(({body})=>{
+      .then(({ body }) => {
         expect(404)
-        expect(body.msg).toBe('not found')
+        expect(body.msg).toBe('no such article')
       })
   })
 
   test('400: responds with error msg of bad request if no such id', () => {
     return request(app)
       .get('/api/articles/holaa')
-      .then(({body})=>{
+      .then(({ body }) => {
         expect(400)
         expect(body.msg).toBe('bad request')
       })

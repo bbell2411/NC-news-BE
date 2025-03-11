@@ -126,6 +126,54 @@ describe('GET /api/articles/:article_id', () => {
   })
 })
 
+describe('GET /api/articles/:article_id/comments', () => {
+  test('200: gets comments from specified article_id', () => {
+    return request(app)
+      .get('/api/articles/9/comments?sort_by=created_at')
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        comment.forEach((com) => {
+          const { comment_id, votes, created_at, author, body, article_id } = com
+          expect(typeof comment_id).toBe('number')
+          expect(typeof votes).toBe('number')
+          expect(typeof created_at).toBe('string')
+          expect(typeof author).toBe('string')
+          expect(typeof body).toBe('string')
+          expect(typeof article_id).toBe('number')
+          expect([com]).toBeSortedBy('created_at', { descending: true })
+        })
+      })
+
+  })
+
+  test('400: responds with error message IF sort query is invalid', () => {
+    return request(app)
+      .get('/api/articles/9/comments?sort_by=body')
+      .then(({ body }) => {
+        expect(400)
+        expect(body.msg).toBe('invalid request')
+      })
+  })
+
+  test('404: responds with error message if article doesnt exists', () => {
+    return request(app)
+      .get('/api/articles/8779/comments')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('no such article id')
+      })
+  })
+
+  test('400: responds with error message if its a bad request', () => {
+    return request(app)
+      .get('/api/articles/holaaa/comments')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request')
+      })
+  })
+})
+
 describe('ANY OTHER PATH', () => {
   test('404: responds with err msg when path is not found', () => {
     return request(app)

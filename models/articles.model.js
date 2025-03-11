@@ -26,3 +26,17 @@ exports.fetchArticlesById = (id) => {
             return rows[0]
         })
 }
+
+exports.fetchComments = (id,sort_by='created_at') => {
+    if (sort_by!=='created_at'){
+        return Promise.reject({status:400,msg:'invalid request'})
+    }
+    return db.query(`select * from comments where article_id=$1
+        ORDER BY ${sort_by} DESC`,[id])
+        .then(({ rows }) => {
+            if (rows.length===0){
+                return Promise.reject({status:404,msg:'no such article id'})
+            }
+            return rows
+        })
+}

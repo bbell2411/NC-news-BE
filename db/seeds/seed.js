@@ -71,7 +71,7 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     .then(() => {
       const nestedArray = articleData.map((article) => {
         const data = convertTimestampToDate(article)
-        return [data.title,
+        return [article.title,
         article.topic,
         article.author,
         article.body,
@@ -87,24 +87,24 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     })
     .then((insertedArticles) => {
       const formattedComments = formatComments(commentData, insertedArticles.rows).map
-        ((comment) => {
-         const data= convertTimestampToDate(comment)
-          return [
-            comment.article_id,
-            comment.body,
-            comment.votes,
-            comment.author,
-            data.created_at
-          ]
-        })
-
+      ((comment) => {
+        const data = convertTimestampToDate(comment)
+        return [
+          comment.article_id,
+          comment.body,
+          comment.votes,
+          comment.author,
+          data.created_at
+        ]
+      })
       const sql = format(`insert into comments
         (article_id,body,votes,author,created_at)
         values
         %L returning *`, formattedComments)
-      return db.query(sql) 
+      return db.query(sql)
     })
-   }
+  
+}
 
 
 module.exports = seed;

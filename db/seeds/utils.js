@@ -1,5 +1,4 @@
 const db = require("../../db/connection");
-const articles = require("../data/test-data/articles");
 
 exports.convertTimestampToDate = ({ created_at, ...otherProperties }) => {
   if (!created_at) return { ...otherProperties };
@@ -23,14 +22,16 @@ exports.formatComments = (commentData, articleData) => {
   if (articleData.length === 0) {
     return []
   }
-  const res = []
-  const articlesFunc = this.articlesLookup(articleData)
-  for (let i = 0; i < commentData.length; i++) {
-    const comment = commentData[i]
-    comment.article_id = articlesFunc[comment.article_title]
-    delete comment.article_title
-    res.push(comment)
+  const commentsCopy = [...commentData]
+  const ariclesCopy = [...articleData]
+  const formattedComments = []
+  const lookupObj = this.articlesLookup(ariclesCopy)
+
+  for (let i = 0; i < commentsCopy.length; i++) {
+    const comment = commentsCopy[i]
+    comment.article_id = lookupObj[comment.article_title]
+    formattedComments.push(comment)
   }
-  return res
+  return formattedComments
 }
 

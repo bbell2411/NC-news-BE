@@ -104,9 +104,9 @@ describe('formatComments',()=>{
     const output= formatComments(input,input2)
     expect(output).toEqual([{
      article_id: 1,
+     article_title:'They\'re not exactly dogs, are they?'
     }])
   })
-})
 
   test('returns an array of the article_id for each title ',()=>{
     const input=[{
@@ -133,11 +133,18 @@ describe('formatComments',()=>{
     const output= formatComments(input,input2)
     expect(output).toEqual([{
      article_id: 1,
+     article_title:'They\'re not exactly dogs, are they?'
     },
     {
       article_id: 2,
+      article_title:"Living in the shadow of a great man"
     },
     {
-      article_id:2
+      article_id:2,
+      article_title:"Living in the shadow of a great man"
     }])
+
+    expect(output).not.toBe(input)
+    expect(input).toBe(input)
   })
+})

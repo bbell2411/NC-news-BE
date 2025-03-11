@@ -22,6 +22,7 @@
       "sort_by",
       "order"
     ],
+    "sort_by":"serves the array of all articles sorted by date in descending order",
     "exampleResponse": {
       "articles": [
         {

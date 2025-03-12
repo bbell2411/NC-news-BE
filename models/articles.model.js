@@ -50,10 +50,10 @@ exports.fetchComments = async (id, sort_by = 'created_at') => {
 
 exports.acceptComment = async (username, body, id) => {
 
-    const invalidText='i hate cats'
+    const invalidText = 'i hate cats'
 
-    if (body===invalidText){
-        return Promise.reject({status:403,msg:'forbidden comment'})
+    if (body === invalidText) {
+        return Promise.reject({ status: 403, msg: 'forbidden comment' })
     }
 
     const validUsername = await db.query(`select * from users where username=$1`, [username])
@@ -72,6 +72,23 @@ exports.acceptComment = async (username, body, id) => {
         values
         ($1,$2,$3) returning *`, [id, username, body])
         .then(({ rows }) => {
+            return rows[0]
+        })
+
+}
+
+exports.renewArticle = (id, inc_votes) => {
+    return db.query(`update articles 
+        set votes = votes + $1
+        where article_id=$2
+        returning *`, [inc_votes, id])
+        .then(({ rows }) => {
+            if (rows.length === 0) {
+                return Promise.reject({ status: 404, msg: 'no such article' })
+            }
+            if (rows[0].votes < 0) {
+                return Promise.reject({ status: 400, msg: 'votes cannot be less than 0' })
+            }
             return rows[0]
         })
 

@@ -1,4 +1,4 @@
-const { fetchArticlesById, fetchArticles, fetchComments, acceptComment } = require('../models/articles.model')
+const { fetchArticlesById, fetchArticles, fetchComments, acceptComment, renewArticle } = require('../models/articles.model')
 
 exports.getArticles = (req, res, next) => {
     const { sort_by } = req.query
@@ -35,9 +35,20 @@ exports.getComments = (req, res, next) => {
 
 exports.postComment = (req, res, next) => {
     const { username, body } = req.body
-    const {article_id}=req.params
-    acceptComment(username,body,article_id).then((postedComment) => {
+    const { article_id } = req.params
+    acceptComment(username, body, article_id).then((postedComment) => {
         res.status(201).send({ postedComment })
+    })
+        .catch((err) => {
+            next(err)
+        })
+}
+
+exports.updateArticle = (req,res,next) => {
+    const {inc_votes}=req.body
+    const {article_id}=req.params
+    renewArticle(article_id,inc_votes).then((updatedArticle)=>{
+        res.status(200).send({updatedArticle})
     })
     .catch((err) => {
         next(err)

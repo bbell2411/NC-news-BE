@@ -139,7 +139,7 @@ describe('GET /api/articles/:article_id/comments', () => {
           expect(typeof created_at).toBe('string')
           expect(typeof author).toBe('string')
           expect(typeof body).toBe('string')
-          expect(typeof article_id).toBe('number')
+          expect(article_id).toBe(9)
           expect([com]).toBeSortedBy('created_at', { descending: true })
         })
       })

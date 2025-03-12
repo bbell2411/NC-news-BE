@@ -328,6 +328,35 @@ describe('PATCH /api/articles/:article_id', () => {
       })
   })
 })
+
+describe('DELETE /api/comments/:comment_id', () => {
+  test('204: responds with no content', () => {
+    return request(app)
+      .delete('/api/comments/1')
+      .expect(204)
+      .then(({ body }) => {
+        expect(body).toEqual({})
+      })
+  })
+
+  test('404: responds with error message if comment doesn\'t exist', () => {
+    return request(app)
+      .delete('/api/comments/9899')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('comment not found')
+      })
+  })
+
+  test('400: responds with error message if bad request', () => {
+    return request(app)
+      .delete('/api/comments/deleteMyComment!!!')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request')
+      })
+  })
+})
 describe('ANY OTHER PATH', () => {
   test('404: responds with err msg when path is not found', () => {
     return request(app)

@@ -44,13 +44,13 @@ exports.postComment = (req, res, next) => {
         })
 }
 
-exports.updateArticle = (req,res,next) => {
-    const {inc_votes}=req.body
-    const {article_id}=req.params
-    renewArticle(article_id,inc_votes).then((updatedArticle)=>{
-        res.status(200).send({updatedArticle})
+exports.updateArticle = (req, res, next) => {
+    const { inc_votes } = req.body
+    const { article_id } = req.params
+    renewArticle(article_id, inc_votes).then((updatedArticle) => {
+        res.status(200).send({ updatedArticle })
     })
-    .catch((err) => {
-        next(err)
-    })
+        .catch((err) => {
+            next(err)
+        })
 }

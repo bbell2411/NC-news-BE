@@ -101,5 +101,11 @@
       "votes": 110,
       "article_img_url":""
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "serves no content after deleted comment",
+    "queries": [],
+    "exampleResponse": {}
   }
+
 }

@@ -93,3 +93,4 @@ exports.renewArticle = (id, inc_votes) => {
         })
 
 }
+

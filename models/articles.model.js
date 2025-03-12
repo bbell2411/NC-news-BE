@@ -1,15 +1,20 @@
 const db = require('../db/connection')
 
-exports.fetchArticles = (sort_by = 'created_at') => {
-    if (sort_by !== 'created_at') {
+exports.fetchArticles = (sort_by = 'created_at', order = 'DESC') => {
+    const validSorts = ['created_at', 'title', 'topic', 'author', 'votes']
+    if (!validSorts.includes(sort_by)) {
         return Promise.reject({ status: 404, msg: 'invalid sort' })
     }
+    if (order !== 'ASC' && order !== 'DESC') {
+        return Promise.reject({ status: 404, msg: 'invalid order' })
+    }
+
     return db.query(`select articles.*, 
         COUNT(comments.article_id) AS comment_count
         From articles
         Join comments on articles.article_id = comments.article_id
         group by articles.article_id
-        ORDER BY articles.${sort_by} DESC;`)
+        ORDER BY articles.${sort_by} ${order};`)
         .then(({ rows }) => {
             return rows
         })
@@ -18,10 +23,6 @@ exports.fetchArticles = (sort_by = 'created_at') => {
 
 
 exports.fetchArticlesById = async (id) => {
-    const idNum = Number(id)
-    if (typeof idNum !== 'number') {
-        return Promise.reject({ status: 400, msg: 'bad request' })
-    }
     return db.query(`select * from articles where article_id=$1`, [id])
         .then(({ rows }) => {
             if (rows.length === 0) {

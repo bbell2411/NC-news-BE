@@ -17,7 +17,11 @@ exports.fetchArticles = (sort_by = 'created_at') => {
 
 
 
-exports.fetchArticlesById = (id) => {
+exports.fetchArticlesById = async (id) => {
+    const idNum = Number(id)
+    if (typeof idNum !== 'number') {
+        return Promise.reject({ status: 400, msg: 'bad request' })
+    }
     return db.query(`select * from articles where article_id=$1`, [id])
         .then(({ rows }) => {
             if (rows.length === 0) {
@@ -27,16 +31,48 @@ exports.fetchArticlesById = (id) => {
         })
 }
 
-exports.fetchComments = (id,sort_by='created_at') => {
-    if (sort_by!=='created_at'){
-        return Promise.reject({status:400,msg:'invalid request'})
+exports.fetchComments = async (id, sort_by = 'created_at') => {
+    if (sort_by !== 'created_at') {
+        return Promise.reject({ status: 400, msg: 'invalid request' })
     }
+    const articleExists = await db.query(`select * from articles where article_id=$1`, [id])
+
+    if (articleExists.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: 'no such article id' })
+    }
+
     return db.query(`select * from comments where article_id=$1
-        ORDER BY ${sort_by} DESC`,[id])
+        ORDER BY ${sort_by} DESC`, [id])
         .then(({ rows }) => {
-            if (rows.length===0){
-                return Promise.reject({status:404,msg:'no such article id'})
-            }
             return rows
         })
+}
+
+exports.acceptComment = async (username, body, id) => {
+
+    const invalidText='i hate cats'
+
+    if (body===invalidText){
+        return Promise.reject({status:403,msg:'forbidden comment'})
+    }
+
+    const validUsername = await db.query(`select * from users where username=$1`, [username])
+    if (validUsername.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: 'this username does not exist' })
+    }
+
+    const validArticleId = await db.query(`select * from articles where article_id=$1`, [id])
+
+    if (validArticleId.rows.length === 0) {
+        return Promise.reject({ status: 400, msg: 'no such article' })
+    }
+
+    return db.query(`insert into comments
+        (article_id,author,body)
+        values
+        ($1,$2,$3) returning *`, [id, username, body])
+        .then(({ rows }) => {
+            return rows[0]
+        })
+
 }

@@ -34,6 +34,8 @@ describe('GET /api/topics', () => {
       .get('/api/topics')
       .expect(200)
       .then(({ body }) => {
+        expect(body.topics.length).toBe(3)
+
         body.topics.forEach((topic) => {
           const { description, slug, img_url } = topic
           expect(typeof description).toBe('string')
@@ -51,8 +53,9 @@ describe('GET /api/articles', () => {
       .get('/api/articles')
       .expect(200)
       .then(({ body: { articles } }) => {
-        articles.forEach((article) => {
+        expect(articles.length).toBe(5)
 
+        articles.forEach((article) => {
           const { article_id, title, topic, author, created_at, votes, article_img_url, comment_count } = article
           expect(typeof article_id).toBe('number')
           expect(typeof author).toBe('string')
@@ -129,9 +132,31 @@ describe('GET /api/articles/:article_id', () => {
 describe('GET /api/articles/:article_id/comments', () => {
   test('200: gets comments from specified article_id', () => {
     return request(app)
+      .get('/api/articles/9/comments')
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment.length).toBe(2)
+
+        comment.forEach((com) => {
+          const { comment_id, votes, created_at, author, body, article_id } = com
+          expect(typeof comment_id).toBe('number')
+          expect(typeof votes).toBe('number')
+          expect(typeof created_at).toBe('string')
+          expect(typeof author).toBe('string')
+          expect(typeof body).toBe('string')
+          expect(article_id).toBe(9)
+        })
+      })
+
+  })
+
+  test('200: gets comments from specified article_id WITH SORT QUERY', () => {
+    return request(app)
       .get('/api/articles/9/comments?sort_by=created_at')
       .expect(200)
       .then(({ body: { comment } }) => {
+        expect(comment.length).toBe(2)
+
         comment.forEach((com) => {
           const { comment_id, votes, created_at, author, body, article_id } = com
           expect(typeof comment_id).toBe('number')
@@ -146,9 +171,18 @@ describe('GET /api/articles/:article_id/comments', () => {
 
   })
 
+  test('200: responds a message if an existing article does not have any comments', () => {
+    return request(app)
+      .get('/api/articles/7/comments')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comment).toEqual([])
+      })
+  })
+
   test('400: responds with error message IF sort query is invalid', () => {
     return request(app)
-      .get('/api/articles/9/comments?sort_by=body')
+      .get('/api/articles/8/comments?sort_by=body')
       .then(({ body }) => {
         expect(400)
         expect(body.msg).toBe('invalid request')
@@ -171,6 +205,66 @@ describe('GET /api/articles/:article_id/comments', () => {
       .then(({ body }) => {
         expect(body.msg).toBe('bad request')
       })
+  })
+})
+
+describe('POST /api/articles/:article_id/comments', () => {
+  test('201: responds with given post request of a comment.', () => {
+    return request(app)
+      .post('/api/articles/6/comments')
+      .send({
+        username: 'icellusedkars',
+        body: 'i love cats'
+      })
+      .expect(201)
+      .then(({ body: { postedComment } }) => {
+        const { article_id, author, body, votes, created_at } = postedComment
+        expect(article_id).toBe(6)
+        expect(typeof votes).toBe('number')
+        expect(typeof created_at).toBe('string')
+        expect(author).toBe('icellusedkars')
+        expect(body).toBe('i love cats')
+      })
+  })
+
+  test('404: responds with error message if username doesnt exist in the database.', () => {
+    return request(app)
+      .post('/api/articles/6/comments')
+      .send({
+        username: 'fakeUser',
+        body: 'i love cats'
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('this username does not exist')
+      })
+  })
+
+  test('400: responds with error message if article_id does not exist.', () => {
+    return request(app)
+      .post('/api/articles/989877/comments')
+      .send({
+        username: 'icellusedkars',
+        body: 'i love cats'
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('no such article')
+      })
+  })
+
+  test('403: responds with error message if comment is banned', () => {
+    return request(app)
+      .post('/api/articles/6/comments')
+      .send({
+        username: 'icellusedkars',
+        body: 'i hate cats'
+      })
+      .then(({ body }) => {
+        expect(403)
+        expect(body.msg).toBe('forbidden comment')
+      })
+
   })
 })
 

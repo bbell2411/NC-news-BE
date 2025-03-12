@@ -2,7 +2,8 @@ const { fetchArticlesById, fetchArticles, fetchComments, acceptComment, renewArt
 
 exports.getArticles = (req, res, next) => {
     const { sort_by } = req.query
-    fetchArticles(sort_by).then((articles) => {
+    const {order}=req.query
+    fetchArticles(sort_by,order).then((articles) => {
         res.status(200).send({ articles })
     })
         .catch((err) => {
@@ -10,6 +11,10 @@ exports.getArticles = (req, res, next) => {
         })
 
 }
+// sort_by, which sorts the articles by any valid column 
+// (defaults to the created_at date).
+// order, which can be set to asc or desc for
+//  ascending or descending (defaults to descending).
 
 exports.getArticlesById = (req, res, next) => {
     const { article_id } = req.params

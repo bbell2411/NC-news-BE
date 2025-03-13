@@ -90,7 +90,6 @@ exports.acceptComment = (username, body, id) => {
         .then(({ rows }) => {
             return rows[0]
         })
-
 }
 
 exports.renewArticle = (id, inc_votes) => {

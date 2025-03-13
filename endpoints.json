@@ -24,6 +24,7 @@
     ],
     "sort_by": "serves the array of all articles sorted by date,topic,votes or author in set order",
     "order": "serves the array of all articles sorted in either descending or ascending order",
+    "topic":"serves an array of articles filtered by an existing topic value",
     "exampleResponse": {
       "articles": [
         {

@@ -70,6 +70,70 @@ describe('GET /api/articles', () => {
       })
 
   })
+
+  test('200: (topics query) filters articles by topic value ', () => {
+    return request(app)
+      .get('/api/articles?topics=mitch')
+      .expect(200)
+      .then(({ body }) => {
+        body.articles.forEach((article) => {
+          const { article_id, title, topic, author, created_at, votes, article_img_url, comment_count } = article
+          expect(typeof article_id).toBe('number')
+          expect(typeof author).toBe('string')
+          expect(typeof title).toBe('string')
+          expect(topic).toBe('mitch')
+          expect(typeof created_at).toBe('string')
+          expect(typeof votes).toBe('number')
+          expect(typeof article_img_url).toBe('string')
+          expect(typeof comment_count).toBe('string')
+        })
+      })
+
+  })
+
+  test('200: (topics query) filters articles by topic value WITH a sort_by query (default to desc order) ', () => {
+    return request(app)
+      .get('/api/articles?topics=mitch&sort_by=created_at')
+      .expect(200)
+      .then(({ body }) => {
+        body.articles.forEach((article) => {
+          const { article_id, title, topic, author, created_at, votes, article_img_url, comment_count } = article
+          expect(typeof article_id).toBe('number')
+          expect(typeof author).toBe('string')
+          expect(typeof title).toBe('string')
+          expect(topic).toBe('mitch')
+          expect(typeof created_at).toBe('string')
+          expect(typeof votes).toBe('number')
+          expect(typeof article_img_url).toBe('string')
+          expect(typeof comment_count).toBe('string')
+          expect(body.articles).toBeSortedBy('created_at', { descending: true })
+        })
+      })
+
+  })
+
+  test('200: (topics query) filters articles by topic value WITH a sort_by query AND ASC order ', () => {
+    return request(app)
+      .get('/api/articles?topics=mitch&sort_by=votes&order=ASC')
+      .expect(200)
+      .then(({ body }) => {
+        body.articles.forEach((article) => {
+          const { article_id, title, topic, author, created_at, votes, article_img_url, comment_count } = article
+          expect(typeof article_id).toBe('number')
+          expect(typeof author).toBe('string')
+          expect(typeof title).toBe('string')
+          expect(topic).toBe('mitch')
+          expect(typeof created_at).toBe('string')
+          expect(typeof votes).toBe('number')
+          expect(typeof article_img_url).toBe('string')
+          expect(typeof comment_count).toBe('string')
+          expect(body.articles).toBeSortedBy('votes', { descending: false })
+        })
+      })
+
+  })
+
+
   test('200: sorts articles by date in descending order', () => {
     return request(app)
       .get('/api/articles?sort_by=created_at&order=DESC')
@@ -164,13 +228,22 @@ describe('GET /api/articles', () => {
       })
   })
 
+  test('404:(topics query) returns error message if the topics query is invalid', () => {
+    return request(app)
+      .get('/api/articles?topics=anythingelse')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('invalid query')
+      })
+
+  })
 
   test('404: returns error message if invalid order', () => {
     return request(app)
       .get('/api/articles?sort_by=title&order=desc')
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('invalid order')
+        expect(body.msg).toBe('invalid order, try in capitals')
       })
 
   })

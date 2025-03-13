@@ -1,21 +1,38 @@
 const db = require('../db/connection')
 const { checkExists } = require('../db/seeds/utils')
 
-exports.fetchArticles = (sort_by = 'created_at', order = 'DESC') => {
+exports.fetchArticles = async (sort_by = 'created_at', order = 'DESC', topics) => {
+    if (topics !== undefined) {
+        const checkTopicsValidity = await db.query(`select * from articles where topic=$1`, [topics])
+        if (checkTopicsValidity.rows.length === 0) {
+            return Promise.reject({ status: 404, msg: 'invalid query' })
+        }
+
+    }
     const validSorts = ['created_at', 'title', 'topic', 'author', 'votes']
     if (!validSorts.includes(sort_by)) {
         return Promise.reject({ status: 404, msg: 'invalid sort' })
     }
     if (order !== 'ASC' && order !== 'DESC') {
-        return Promise.reject({ status: 404, msg: 'invalid order' })
+        return Promise.reject({ status: 404, msg: 'invalid order, try in capitals' })
     }
 
-    return db.query(`select articles.*, 
+    let finalQuery = `select articles.*, 
         COUNT(comments.article_id) AS comment_count
         From articles
-        Join comments on articles.article_id = comments.article_id
-        group by articles.article_id
-        ORDER BY articles.${sort_by} ${order};`)
+        Join comments on articles.article_id = comments.article_id `
+
+    const queries = []
+
+    if (topics) {
+        queries.push(topics)
+        finalQuery += `where articles.topic=$1 `
+    }
+
+    finalQuery += `group by articles.article_id
+        ORDER BY articles.${sort_by} ${order};`
+
+    return db.query(finalQuery, queries)
         .then(({ rows }) => {
             return rows
         })
@@ -50,7 +67,7 @@ exports.fetchComments = async (id, sort_by = 'created_at') => {
         })
 }
 
-exports.acceptComment = async (username, body, id) => {
+exports.acceptComment = (username, body, id) => {
     if (!username || !body) {
         return Promise.reject({ status: 400, msg: 'must have the valid keys and/or valid values' })
     }
@@ -73,7 +90,7 @@ exports.acceptComment = async (username, body, id) => {
 
 exports.renewArticle = (id, inc_votes) => {
     if (!inc_votes) {
-        return Promise.reject({ status: 400, msg:'missing required field'})
+        return Promise.reject({ status: 400, msg: 'missing required field' })
     }
     return db.query(`update articles 
         set votes = votes + $1

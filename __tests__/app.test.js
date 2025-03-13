@@ -255,7 +255,7 @@ describe('GET /api/articles/:article_id', () => {
       .get('/api/articles/3')
       .expect(200)
       .then(({ body: article }) => {
-        const { article_id, author, title, body, topic, created_at, votes, article_img_url } = article.article
+        const { article_id, author, title, body, topic, created_at, votes, article_img_url, comment_count } = article.article
         expect(article_id).toBe(3)
         expect(typeof author).toBe('string')
         expect(typeof title).toBe('string')
@@ -264,6 +264,7 @@ describe('GET /api/articles/:article_id', () => {
         expect(typeof created_at).toBe('string')
         expect(typeof votes).toBe('number')
         expect(typeof article_img_url).toBe('string')
+        expect(typeof comment_count).toBe('string')
 
       })
   })

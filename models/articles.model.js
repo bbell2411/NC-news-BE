@@ -13,7 +13,7 @@ exports.fetchArticles = async (sort_by = 'created_at', order = 'DESC', topics) =
     if (!validSorts.includes(sort_by)) {
         return Promise.reject({ status: 400, msg: 'invalid sort' })
     }
-    const validOrders=['ASC', 'DESC','desc','asc']
+    const validOrders = ['ASC', 'DESC', 'desc', 'asc']
     if (!validOrders.includes(order)) {
         return Promise.reject({ status: 400, msg: 'invalid order' })
     }
@@ -42,7 +42,11 @@ exports.fetchArticles = async (sort_by = 'created_at', order = 'DESC', topics) =
 
 
 exports.fetchArticlesById = async (id) => {
-    return db.query(`select * from articles where article_id=$1`, [id])
+    return db.query(`select articles.*,
+         COUNT(comments.article_id) AS comment_count from articles
+         JOIN comments on comments.article_id=articles.article_id
+         where articles.article_id=$1
+         group by articles.article_id`, [id])
         .then(({ rows }) => {
             if (rows.length === 0) {
                 return Promise.reject({ status: 404, msg: 'no such article' })

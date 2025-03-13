@@ -1,6 +1,6 @@
 const { commentData } = require("../db/data/test-data");
 const {
-  convertTimestampToDate, articlesLookup,formatComments
+  convertTimestampToDate, articlesLookup, formatComments, checkExists
 } = require("../db/seeds/utils");
 
 describe("convertTimestampToDate", () => {
@@ -39,24 +39,24 @@ describe("convertTimestampToDate", () => {
   });
 });
 //change article_title to be article_id=the actual id
-describe('articlesLookup',()=>{
-  test('returns empty object if array is empty.',()=>{
-     const input= []
-    const output=articlesLookup(input)
+describe('articlesLookup', () => {
+  test('returns empty object if array is empty.', () => {
+    const input = []
+    const output = articlesLookup(input)
     expect(output).toEqual({})
   })
-  test('returns an object with the article\'s title as a key and id as it\'s value ',()=>{
-    const input=[{
+  test('returns an object with the article\'s title as a key and id as it\'s value ', () => {
+    const input = [{
       article_id: 1,
       title: 'Living in the shadow of a great man'
     }]
 
-    const output=articlesLookup(input)
-    expect(output).toEqual({'Living in the shadow of a great man':1})
+    const output = articlesLookup(input)
+    expect(output).toEqual({ 'Living in the shadow of a great man': 1 })
 
   })
-  test('returns an object with the article\'s title as a key and id as it\'s value from an array with multiple objects',()=>{
-    const input=[{
+  test('returns an object with the article\'s title as a key and id as it\'s value from an array with multiple objects', () => {
+    const input = [{
       article_id: 1,
       title: 'dhdw'
     },
@@ -69,18 +69,19 @@ describe('articlesLookup',()=>{
       title: 'hellp4'
     }]
 
-    const output=articlesLookup(input)
-    expect(output).toEqual({dhdw:1,
-      hello3:2,
-      hellp4:3
+    const output = articlesLookup(input)
+    expect(output).toEqual({
+      dhdw: 1,
+      hello3: 2,
+      hellp4: 3
     })
 
   })
 })
 
-describe('formatComments',()=>{
-  test('returns empty object if input array is empty',()=>{
-    const input=[{
+describe('formatComments', () => {
+  test('returns empty object if input array is empty', () => {
+    const input = [{
       article_title: "They're not exactly dogs, are they?",
     },
     {
@@ -89,27 +90,27 @@ describe('formatComments',()=>{
     {
       article_title: "Living in the shadow of a great man",
     }]
-    const input2=[]
-    const output= formatComments(input,input2)
+    const input2 = []
+    const output = formatComments(input, input2)
     expect(output).toEqual([])
   })
-  test('returns an array of the article_id for one title ',()=>{
-    const input=[{
+  test('returns an array of the article_id for one title ', () => {
+    const input = [{
       article_title: "They're not exactly dogs, are they?",
     }]
-    const input2=[{
+    const input2 = [{
       article_id: 1,
       title: 'They\'re not exactly dogs, are they?'
     }]
-    const output= formatComments(input,input2)
+    const output = formatComments(input, input2)
     expect(output).toEqual([{
-     article_id: 1,
-     article_title:'They\'re not exactly dogs, are they?'
+      article_id: 1,
+      article_title: 'They\'re not exactly dogs, are they?'
     }])
   })
 
-  test('returns an array of the article_id for each title ',()=>{
-    const input=[{
+  test('returns an array of the article_id for each title ', () => {
+    const input = [{
       article_title: "They're not exactly dogs, are they?",
     },
     {
@@ -118,7 +119,7 @@ describe('formatComments',()=>{
     {
       article_title: "Living in the shadow of a great man",
     }]
-    const input2=[{
+    const input2 = [{
       article_id: 1,
       title: 'They\'re not exactly dogs, are they?'
     },
@@ -130,21 +131,38 @@ describe('formatComments',()=>{
       article_id: 2,
       title: "Living in the shadow of a great man",
     }]
-    const output= formatComments(input,input2)
+    const output = formatComments(input, input2)
     expect(output).toEqual([{
-     article_id: 1,
-     article_title:'They\'re not exactly dogs, are they?'
+      article_id: 1,
+      article_title: 'They\'re not exactly dogs, are they?'
     },
     {
       article_id: 2,
-      article_title:"Living in the shadow of a great man"
+      article_title: "Living in the shadow of a great man"
     },
     {
-      article_id:2,
-      article_title:"Living in the shadow of a great man"
+      article_id: 2,
+      article_title: "Living in the shadow of a great man"
     }])
 
     expect(output).not.toBe(input)
     expect(input).toBe(input)
+  })
+})
+
+describe('CHECK EXISTS', () => {
+  test('resolves with true if resource exists', () => {
+    checkExists('comments','comment_id',1)
+    .then((res)=>{
+      expect(res).toBe(true)
+    })
+  })
+
+  test('resolves with 404 error message if resource does not exist', () => {
+    checkExists('comments','comment_id',5754)
+    .then((res)=>{
+      expect(res.status).toBe(404)
+      expect(res.msg).toBe('not found')
+    })
   })
 })

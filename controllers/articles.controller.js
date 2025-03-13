@@ -2,8 +2,8 @@ const { fetchArticlesById, fetchArticles, fetchComments, acceptComment, renewArt
 
 exports.getArticles = (req, res, next) => {
     const { sort_by } = req.query
-    const {order}=req.query
-    fetchArticles(sort_by,order).then((articles) => {
+    const { order } = req.query
+    fetchArticles(sort_by, order).then((articles) => {
         res.status(200).send({ articles })
     })
         .catch((err) => {

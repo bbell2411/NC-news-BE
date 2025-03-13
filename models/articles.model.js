@@ -1,4 +1,5 @@
 const db = require('../db/connection')
+const { checkExists } = require('../db/seeds/utils')
 
 exports.fetchArticles = (sort_by = 'created_at', order = 'DESC') => {
     const validSorts = ['created_at', 'title', 'topic', 'author', 'votes']
@@ -50,28 +51,20 @@ exports.fetchComments = async (id, sort_by = 'created_at') => {
 }
 
 exports.acceptComment = async (username, body, id) => {
-
-    const invalidText = 'i hate cats'
-
-    if (body === invalidText) {
-        return Promise.reject({ status: 403, msg: 'forbidden comment' })
+    if (!username || !body) {
+        return Promise.reject({ status: 400, msg: 'must have the valid keys and/or valid values' })
     }
 
-    const validUsername = await db.query(`select * from users where username=$1`, [username])
-    if (validUsername.rows.length === 0) {
-        return Promise.reject({ status: 404, msg: 'this username does not exist' })
-    }
+    return Promise.all([checkExists('users', 'username', username),
+    checkExists('articles', 'article_id', id)
+    ])
+        .then(() => {
+            return db.query(`insert into comments
+            (article_id,author,body)
+            values
+            ($1,$2,$3) returning *`, [id, username, body])
 
-    const validArticleId = await db.query(`select * from articles where article_id=$1`, [id])
-
-    if (validArticleId.rows.length === 0) {
-        return Promise.reject({ status: 400, msg: 'no such article' })
-    }
-
-    return db.query(`insert into comments
-        (article_id,author,body)
-        values
-        ($1,$2,$3) returning *`, [id, username, body])
+        })
         .then(({ rows }) => {
             return rows[0]
         })
@@ -79,6 +72,9 @@ exports.acceptComment = async (username, body, id) => {
 }
 
 exports.renewArticle = (id, inc_votes) => {
+    if (!inc_votes) {
+        return Promise.reject({ status: 400, msg:'missing required field'})
+    }
     return db.query(`update articles 
         set votes = votes + $1
         where article_id=$2

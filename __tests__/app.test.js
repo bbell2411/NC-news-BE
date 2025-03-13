@@ -333,7 +333,7 @@ describe('POST /api/articles/:article_id/comments', () => {
       .then(({ body: { postedComment } }) => {
         const { article_id, author, body, votes, created_at } = postedComment
         expect(article_id).toBe(6)
-        expect(typeof votes).toBe('number')
+        expect(votes).toBe(0)
         expect(typeof created_at).toBe('string')
         expect(author).toBe('icellusedkars')
         expect(body).toBe('i love cats')
@@ -349,36 +349,47 @@ describe('POST /api/articles/:article_id/comments', () => {
       })
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('this username does not exist')
+        expect(body.msg).toBe('not found')
       })
   })
 
-  test('400: responds with error message if article_id does not exist.', () => {
+  test('404: responds with error message if article_id does not exist.', () => {
     return request(app)
       .post('/api/articles/989877/comments')
       .send({
         username: 'icellusedkars',
         body: 'i love cats'
       })
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('no such article')
+        expect(body.msg).toBe('not found')
       })
   })
 
-  test('403: responds with error message if comment is banned', () => {
+  test('400: responds with error message if body is empty.', () => {
     return request(app)
-      .post('/api/articles/6/comments')
+      .post('/api/articles/3/comments')
       .send({
         username: 'icellusedkars',
-        body: 'i hate cats'
+        body: ''
       })
+      .expect(400)
       .then(({ body }) => {
-        expect(403)
-        expect(body.msg).toBe('forbidden comment')
+        expect(body.msg).toBe('must have the valid keys and/or valid values')
       })
-
   })
+  test('400: responds with error message if no or missing keys.', () => {
+    return request(app)
+      .post('/api/articles/3/comments')
+      .send({
+        body: 'hello'
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('must have the valid keys and/or valid values')
+      })
+  })
+
 })
 
 describe('PATCH /api/articles/:article_id', () => {
@@ -438,6 +449,15 @@ describe('PATCH /api/articles/:article_id', () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe('bad request')
+      })
+  })
+  test('400: responds with error if inc_votes property is missing from the object', () => {
+    return request(app)
+      .patch('/api/articles/2')
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('missing required field')
       })
   })
 })

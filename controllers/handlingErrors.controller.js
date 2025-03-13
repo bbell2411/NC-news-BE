@@ -12,9 +12,6 @@ exports.handleCustomErrors = (err, req, res, next) => {
     }
     else { next(err) }
 }
-
 exports.handleServerErrors = (err, req, res, next) => {
     res.status(500).send({ msg: 'something went wrong' })
 }
-
-  

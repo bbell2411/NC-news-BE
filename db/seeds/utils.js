@@ -35,3 +35,13 @@ exports.formatComments = (commentData, articleData) => {
   return formattedComments
 }
 
+const format = require('pg-format')
+
+exports.checkExists = (table, column, value) => {
+  const sqlString = format(`select * from %I where %I = $1`, table, column)
+  return db.query(sqlString, [value]).then(({ rows }) => {
+    if (rows.length===0){
+      return Promise.reject({status:404,msg:'not found'})
+    }
+  })
+}

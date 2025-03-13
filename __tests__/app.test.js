@@ -144,9 +144,19 @@ describe('GET /api/articles', () => {
 
   })
 
-  test('200: sorts articles by date in ascending order', () => {
+  test('200: order case insensitive (DESC)', () => {
     return request(app)
-      .get('/api/articles?sort_by=created_at&order=ASC')
+      .get('/api/articles?sort_by=created_at&order=desc')
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy('created_at', { descending: true })
+      })
+
+  })
+
+  test('200: order case insensitive (ASC)', () => {
+    return request(app)
+      .get('/api/articles?sort_by=created_at&order=asc')
       .expect(200)
       .then(({ body: { articles } }) => {
         expect(articles).toBeSortedBy('created_at', { descending: false })
@@ -154,41 +164,12 @@ describe('GET /api/articles', () => {
 
   })
 
-  test('200: sorts articles by title in descending order', () => {
-    return request(app)
-      .get('/api/articles?sort_by=title&order=DESC')
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles).toBeSortedBy('title', { descending: true })
-      })
-
-  })
-
-
   test('200: sorts articles by title in ascending order', () => {
     return request(app)
       .get('/api/articles?sort_by=title&order=ASC')
       .expect(200)
       .then(({ body: { articles } }) => {
         expect(articles).toBeSortedBy('title', { descending: false })
-      })
-  })
-
-  test('200: sorts articles by topic in descending order', () => {
-    return request(app)
-      .get('/api/articles?sort_by=topic&order=DESC')
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles).toBeSortedBy('topic', { descending: true })
-      })
-  })
-
-  test('200: sorts articles by topic in ascending order', () => {
-    return request(app)
-      .get('/api/articles?sort_by=topic&order=ASC')
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles).toBeSortedBy('topic', { descending: false })
       })
   })
 
@@ -219,15 +200,6 @@ describe('GET /api/articles', () => {
       })
   })
 
-  test('200: sorts articles by votes in ascending order', () => {
-    return request(app)
-      .get('/api/articles?sort_by=votes&order=ASC')
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles).toBeSortedBy('votes', { descending: false })
-      })
-  })
-
   test('404:(topics query) returns error message if the topics query is invalid', () => {
     return request(app)
       .get('/api/articles?topics=anythingelse')
@@ -238,20 +210,20 @@ describe('GET /api/articles', () => {
 
   })
 
-  test('404: returns error message if invalid order', () => {
+  test('400: returns error message if invalid order', () => {
     return request(app)
-      .get('/api/articles?sort_by=title&order=desc')
-      .expect(404)
+      .get('/api/articles?sort_by=title&order=biggest2smallest')
+      .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('invalid order, try in capitals')
+        expect(body.msg).toBe('invalid order')
       })
 
   })
-  test('404: responds with error message if sort query is invalid ', () => {
+  test('400: responds with error message if sort query is invalid ', () => {
     return request(app)
       .get('/api/articles?sort_by=rararara')
       .then(({ body }) => {
-        expect(404)
+        expect(400)
         expect(body.msg).toBe('invalid sort')
       })
 

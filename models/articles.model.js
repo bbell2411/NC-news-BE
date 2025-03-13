@@ -11,10 +11,11 @@ exports.fetchArticles = async (sort_by = 'created_at', order = 'DESC', topics) =
     }
     const validSorts = ['created_at', 'title', 'topic', 'author', 'votes']
     if (!validSorts.includes(sort_by)) {
-        return Promise.reject({ status: 404, msg: 'invalid sort' })
+        return Promise.reject({ status: 400, msg: 'invalid sort' })
     }
-    if (order !== 'ASC' && order !== 'DESC') {
-        return Promise.reject({ status: 404, msg: 'invalid order, try in capitals' })
+    const validOrders=['ASC', 'DESC','desc','asc']
+    if (!validOrders.includes(order)) {
+        return Promise.reject({ status: 400, msg: 'invalid order' })
     }
 
     let finalQuery = `select articles.*, 

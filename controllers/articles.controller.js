@@ -38,6 +38,7 @@ exports.getComments = (req, res, next) => {
 exports.postComment = (req, res, next) => {
     const { username, body } = req.body
     const { article_id } = req.params
+
     acceptComment(username, body, article_id).then((postedComment) => {
         res.status(201).send({ postedComment })
     })

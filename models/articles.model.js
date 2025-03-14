@@ -2,9 +2,14 @@ const db = require('../db/connection')
 const { checkExists } = require('../db/seeds/utils')
 
 exports.fetchArticles = async (sort_by = 'created_at', order = 'DESC', topics) => {
+    let topicExists = false
     if (topics !== undefined) {
+        const checkTopicExists = await db.query(`select * from topics where slug=$1`, [topics])
+        if (checkTopicExists.rows.length > 0) {
+            topicExists = true
+        }
         const checkTopicsValidity = await db.query(`select * from articles where topic=$1`, [topics])
-        if (checkTopicsValidity.rows.length === 0) {
+        if (checkTopicsValidity.rows.length === 0 && !topicExists) {
             return Promise.reject({ status: 404, msg: 'invalid query' })
         }
 

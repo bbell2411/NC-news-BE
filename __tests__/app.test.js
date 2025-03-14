@@ -76,6 +76,7 @@ describe('GET /api/articles', () => {
       .get('/api/articles?topics=mitch')
       .expect(200)
       .then(({ body }) => {
+        expect(body.articles.length).toBeGreaterThan(0)
         body.articles.forEach((article) => {
           const { article_id, title, topic, author, created_at, votes, article_img_url, comment_count } = article
           expect(typeof article_id).toBe('number')
@@ -91,11 +92,23 @@ describe('GET /api/articles', () => {
 
   })
 
+  test('200: (topics query) filters articles by topic value but with a valid topic that has no corresponding articles ', () => {
+    return request(app)
+      .get('/api/articles?topics=paper')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(0)
+        expect(body.articles).toEqual([])
+      })
+
+  })
+
   test('200: (topics query) filters articles by topic value WITH a sort_by query (default to desc order) ', () => {
     return request(app)
       .get('/api/articles?topics=mitch&sort_by=created_at')
       .expect(200)
       .then(({ body }) => {
+        expect(body.articles.length).toBeGreaterThan(0)
         body.articles.forEach((article) => {
           const { article_id, title, topic, author, created_at, votes, article_img_url, comment_count } = article
           expect(typeof article_id).toBe('number')
@@ -117,6 +130,7 @@ describe('GET /api/articles', () => {
       .get('/api/articles?topics=mitch&sort_by=votes&order=ASC')
       .expect(200)
       .then(({ body }) => {
+        expect(body.articles.length).toBeGreaterThan(0)
         body.articles.forEach((article) => {
           const { article_id, title, topic, author, created_at, votes, article_img_url, comment_count } = article
           expect(typeof article_id).toBe('number')
@@ -236,6 +250,7 @@ describe('GET /api/users ', () => {
       .get('/api/users')
       .expect(200)
       .then(({ body }) => {
+        expect(body.users.length).toBeGreaterThan(0)
         body.users.forEach((user) => {
           const { username, name, avatar_url } = user
           expect(typeof username).toBe('string')

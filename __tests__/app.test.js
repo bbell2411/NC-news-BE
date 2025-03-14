@@ -64,7 +64,7 @@ describe('GET /api/articles', () => {
           expect(typeof created_at).toBe('string')
           expect(typeof votes).toBe('number')
           expect(typeof article_img_url).toBe('string')
-          expect(typeof comment_count).toBe('string')
+          expect(typeof comment_count).toBe('number')
 
         })
       })
@@ -86,7 +86,7 @@ describe('GET /api/articles', () => {
           expect(typeof created_at).toBe('string')
           expect(typeof votes).toBe('number')
           expect(typeof article_img_url).toBe('string')
-          expect(typeof comment_count).toBe('string')
+          expect(typeof comment_count).toBe('number')
         })
       })
 
@@ -118,7 +118,7 @@ describe('GET /api/articles', () => {
           expect(typeof created_at).toBe('string')
           expect(typeof votes).toBe('number')
           expect(typeof article_img_url).toBe('string')
-          expect(typeof comment_count).toBe('string')
+          expect(typeof comment_count).toBe('number')
           expect(body.articles).toBeSortedBy('created_at', { descending: true })
         })
       })
@@ -140,7 +140,7 @@ describe('GET /api/articles', () => {
           expect(typeof created_at).toBe('string')
           expect(typeof votes).toBe('number')
           expect(typeof article_img_url).toBe('string')
-          expect(typeof comment_count).toBe('string')
+          expect(typeof comment_count).toBe('number')
           expect(body.articles).toBeSortedBy('votes', { descending: false })
         })
       })
@@ -270,6 +270,23 @@ describe('GET /api/articles/:article_id', () => {
       .get('/api/articles/3')
       .expect(200)
       .then(({ body: article }) => {
+        const { article_id, author, title, body, topic, created_at, votes, article_img_url } = article.article
+        expect(article_id).toBe(3)
+        expect(typeof author).toBe('string')
+        expect(typeof title).toBe('string')
+        expect(typeof body).toBe('string')
+        expect(typeof topic).toBe('string')
+        expect(typeof created_at).toBe('string')
+        expect(typeof votes).toBe('number')
+        expect(typeof article_img_url).toBe('string')
+
+      })
+  })
+  test('200: responds with articles by specific id with comment count', () => {
+    return request(app)
+      .get('/api/articles/3')
+      .expect(200)
+      .then(({ body: article }) => {
         const { article_id, author, title, body, topic, created_at, votes, article_img_url, comment_count } = article.article
         expect(article_id).toBe(3)
         expect(typeof author).toBe('string')
@@ -279,7 +296,7 @@ describe('GET /api/articles/:article_id', () => {
         expect(typeof created_at).toBe('string')
         expect(typeof votes).toBe('number')
         expect(typeof article_img_url).toBe('string')
-        expect(typeof comment_count).toBe('string')
+        expect(typeof comment_count).toBe('number')
 
       })
   })

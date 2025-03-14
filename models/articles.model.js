@@ -24,7 +24,7 @@ exports.fetchArticles = async (sort_by = 'created_at', order = 'DESC', topics) =
     }
 
     let finalQuery = `select articles.*, 
-        COUNT(comments.article_id) AS comment_count
+        COUNT(comments.article_id)::INT AS comment_count
         From articles
         Join comments on articles.article_id = comments.article_id `
 
@@ -48,7 +48,7 @@ exports.fetchArticles = async (sort_by = 'created_at', order = 'DESC', topics) =
 
 exports.fetchArticlesById = async (id) => {
     return db.query(`select articles.*,
-         COUNT(comments.article_id) AS comment_count from articles
+         COUNT(comments.article_id)::INT  AS comment_count from articles
          JOIN comments on comments.article_id=articles.article_id
          where articles.article_id=$1
          group by articles.article_id`, [id])

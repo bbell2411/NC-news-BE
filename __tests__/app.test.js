@@ -569,13 +569,13 @@ describe('DELETE /api/comments/:comment_id', () => {
   })
 })
 
-xdescribe('ANY OTHER PATH', () => {
+describe('ANY OTHER PATH', () => {
   test('404: responds with err msg when path is not found', () => {
     return request(app)
       .get('/blahblah')
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('path not found')
+        expect(body.msg).toBe('path not found!')
       })
   })
 })

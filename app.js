@@ -21,7 +21,7 @@ app.get('/api', getEndpoints)
 
 app.post('/api/test', (req, res) => {
     res.status(200).send({ msg: 'test route works!' })
-})
+});
 
 app.get('/api/topics', getTopics)
 

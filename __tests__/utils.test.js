@@ -1,4 +1,4 @@
-const { commentData } = require("../db/data/test-data");
+const db = require('../db/connection')
 const {
   convertTimestampToDate, articlesLookup, formatComments, checkExists
 } = require("../db/seeds/utils");
@@ -150,7 +150,7 @@ describe('formatComments', () => {
   })
 })
 
-describe.skip('CHECK EXISTS', () => {
+describe('CHECK EXISTS', () => {
   test('resolves with true if resource exists', () => {
     checkExists('comments','comment_id',1)
     .then((res)=>{
@@ -158,11 +158,17 @@ describe.skip('CHECK EXISTS', () => {
     })
   })
 
-  test('resolves with 404 error message if resource does not exist', () => {
-    checkExists('comments','comment_id',5754)
-    .then((res)=>{
-      expect(res.status).toBe(404)
-      expect(res.msg).toBe('not found')
-    })
-  })
+  test('rejects with 404 error message if resource does not exist', () => {
+    return checkExists('comments', 'comment_id', 5754)
+      .then(() => {
+        throw new Error('Expected method to reject.');
+      })
+      .catch((err) => {
+        expect(err.status).toBe(404);
+        expect(err.msg).toBe('not found');
+      });
+  });
+  afterAll(() => {
+    return db.end();
+  });
 })

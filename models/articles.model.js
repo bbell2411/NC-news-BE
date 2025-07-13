@@ -98,9 +98,10 @@ exports.acceptComment = (username, body, id) => {
 }
 
 exports.renewArticle = (id, inc_votes) => {
-    if (!inc_votes) {
-        return Promise.reject({ status: 400, msg: 'missing required field' })
-    }
+    if (typeof inc_votes !== 'number') {
+        return Promise.reject({ status: 400, msg: 'bad request' });
+      }
+    
     return db.query(`update articles 
         set votes = votes + $1
         where article_id=$2
@@ -108,9 +109,6 @@ exports.renewArticle = (id, inc_votes) => {
         .then(({ rows }) => {
             if (rows.length === 0) {
                 return Promise.reject({ status: 404, msg: 'no such article' })
-            }
-            if (rows[0].votes < 0) {
-                return Promise.reject({ status: 400, msg: 'votes cannot be less than 0' })
             }
             return rows[0]
         })

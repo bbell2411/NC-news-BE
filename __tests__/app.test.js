@@ -471,10 +471,10 @@ describe('POST /api/articles/:article_id/comments', () => {
 })
 
 describe('PATCH /api/articles/:article_id', () => {
-  test('200: responds with the updated article', () => {
+  test('200: responds with the updated UPVOTED article', () => {
     return request(app)
       .patch('/api/articles/1')
-      .send({ inc_votes: 10 })
+      .send({ inc_votes: 1 })
       .expect(200)
       .then(({ body: { updatedArticle } }) => {
         const { article_id, title, topic, author, body, created_at, votes, article_img_url } = updatedArticle
@@ -484,7 +484,26 @@ describe('PATCH /api/articles/:article_id', () => {
         expect(typeof author).toBe('string')
         expect(typeof body).toBe('string')
         expect(typeof created_at).toBe('string')
-        expect(votes).toBe(110)
+        expect(votes).toBe(101)
+        expect(typeof article_img_url).toBe('string')
+      })
+
+  })
+
+  test('200: responds with the updated DOWNVOTED article', () => {
+    return request(app)
+      .patch('/api/articles/1')
+      .send({ inc_votes: -1 })
+      .expect(200)
+      .then(({ body: { updatedArticle } }) => {
+        const { article_id, title, topic, author, body, created_at, votes, article_img_url } = updatedArticle
+        expect(article_id).toBe(1)
+        expect(typeof title).toBe('string')
+        expect(typeof topic).toBe('string')
+        expect(typeof author).toBe('string')
+        expect(typeof body).toBe('string')
+        expect(typeof created_at).toBe('string')
+        expect(votes).toBe(99)
         expect(typeof article_img_url).toBe('string')
       })
 
@@ -510,16 +529,6 @@ describe('PATCH /api/articles/:article_id', () => {
       })
   })
 
-  test('400: responds with error if votes is already 0 & can no longer be decremented', () => {
-    return request(app)
-      .patch('/api/articles/2')
-      .send({ inc_votes: -20 })
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe('votes cannot be less than 0')
-      })
-  })
-
   test('400: responds with error if votes is not a number', () => {
     return request(app)
       .patch('/api/articles/2')
@@ -535,7 +544,7 @@ describe('PATCH /api/articles/:article_id', () => {
       .send({})
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('missing required field')
+        expect(body.msg).toBe('bad request')
       })
   })
 })

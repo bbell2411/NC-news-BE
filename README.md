@@ -1,6 +1,6 @@
 # NC News Seeding
 
-- link to hosted server: https://nc-newz-u95l.onrender.com
+- link to hosted server: https://nc-newz-u95l.onrender.com/api
 
 - NC-news API is a RESTful backend service for a news application, allowing users
   to interact with articles, comments and topics.

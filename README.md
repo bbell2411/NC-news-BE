@@ -1,63 +1,69 @@
-# NC News Seeding
+# 📰 NC News Backend API
 
-- link to hosted server: https://nc-newz-u95l.onrender.com/api
+🔗[Live hosted link](https://nc-newz-u95l.onrender.com/api)
 
-- NC-news API is a RESTful backend service for a news application, allowing users
-  to interact with articles, comments and topics.
-  It provides endpoints for fetching, posting, updating and deleting articles and comments, along side features such as, filtering and sorting options.
+A RESTful backend service built for a news application, allowing users to interact with articles, comments, topics, and users.
+Includes full CRUD functionality, filtering, sorting, and pagination.
 
-- Built with Node.js, Express, and PostgresSQL.
+# 📚 Tech Stack
 
-- This project follows MVC architecture and includes fully tested
-  endpoints using jest.
+- Node.js
 
-# Requirements to run the project
+- Express
 
-- Ensure you have the minimum versions of NODE.js and Postgres.
+- PostgreSQL
 
-# Features
+- Jest for testing
 
-- Fetch all articles or filter by topic.
+- MVC architecture
 
-- Sort articles by date, votes, title or author in ascending or descending order.
+# ✅ Features
 
-- View an article's details, aswell as it's comment count.
+- Fetch all articles or filter them by topic.
 
-- Post comments under an article.
+- Sort articles by date, votes, title, or author in ascending/descending order.
+
+- View individual article details including comment count.
+
+- Post comments on articles.
 
 - Upvote/downvote articles.
 
 - Delete comments.
 
-# Clone repository
+# 🛠 Requirements
 
-- Copy the repository URL and paste in the terminal: git clone <repo-url>
+- Node.js (v18+ recommended)
 
-# Install dependencies
+- PostgreSQL
 
-- install dependencies included in the package.json file.
+# 🚀 Getting Started
 
-- Terminal command: npm install 
+## 1. Clone the Repository
+```
+git clone <repo-url>
+cd nc-news
+```
+## 2. Install Dependencies
+```
+npm install
+```
+## 3. Set Up Environment Variables
+Create two .env files in the root of your project:
 
-# Instructions for .env setup
+### .env.development
+PGDATABASE=nc_news
 
-- Create 2 .env files in the root directory.
+### .env.test
+PGDATABASE=nc_news_test
 
-- First file name ".env.development" with the ENVIRONMENTAL variable
-  PGDATABASE set to nc_news.
-
-- Second file name ".env.test" with the ENVIRONMENTAL variable
-  PGDATABASE set to nc_news_test.
-
-# Seed local database
-
-- Package.json includes scripts to run in order to seed both the
-  developement and test database with the following commands.
-
-- Setting up the databases: npm run setup-dbs
-
-- To connect to development database: npm run seed-dev
-
-- To connect to test database: npm run test-seed
-
-- To run tests on the test database: npm test
+## 4. Create and Seed the Databases
+```
+npm run setup-dbs
+npm run test-seed
+npm run seed-dev
+```
+## 5. Run Tests
+```
+npm test
+```
